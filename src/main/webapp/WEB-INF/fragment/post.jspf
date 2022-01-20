@@ -1,0 +1,64 @@
+<c:choose>
+                                <c:when test="${fn:length(posts)==0}">
+                                    <p>Some error happened. No posts...</p>
+                                </c:when>
+                                <c:otherwise>
+                                    <c:forEach items="${posts}" var="post">
+                                        <div class="post">
+                                            <div class="post-content">
+                                                <div class="post-content-meta">
+                                                    <div class="meta-info">
+                                                        <span class="meta-info-user">
+                                                            <a href="<c:url value=''>
+                                                        <c:param name='action' value='userProfile' />
+                                                        <c:param name='userLogin' value='${post.userLogin}' />
+                                                        </c:url>" class="user-login-link">
+                                                                <c:out value="${post.userLogin}" />
+                                                            </a>
+                                                        </span>
+                                                        <span class="meta-info-time">
+                                                            <c:out value="${post.publishedAt}" />
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="post-content-title">
+                                                    <h2 class="post-title">
+                                                        <a href="<c:url value=''>
+                                                    <c:param name='action' value='postDetail' />
+                                                    <c:param name='postSlug' value='${post.slug}' />
+                                                    </c:url>" class="post-title-link">
+                                                            <c:out value="${post.title}" />
+                                                        </a>
+                                                    </h2>
+                                                </div>
+                                                <div class="post-content-tags">
+                                                    <%@ include file="/WEB-INF/fragment/tag.jspf" %>
+                                                </div>
+                                                <div class="post-content-category">
+                                                    <span class="post-category">
+                                                        <a href="<c:url value=''>
+                                                    <c:param name='action' value='relatedPost' />
+                                                    <c:param name='category' value='${post.category.slug}' />
+                                                    </c:url>" class="post-category-link">
+                                                            <c:out value="${post.category.title}" />
+                                                        </a>
+                                                    </span>
+                                                </div>
+                                                <div class="post-content-body">
+                                                    <p>
+                                                        <c:out value="${blog:abbreviate(post.content, 400)}" />
+                                                    </p>
+                                                    <a href="<c:url value=''>
+                                                <c:param name='action' value='postDetail' />
+                                                <c:param name='postSlug' value='${post.slug}' />
+                                                </c:url>" class="post-readmore">
+                                                        <span>
+                                                            <fmt:message key="blog.more" />
+                                                        </span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </c:forEach>
+                                </c:otherwise>
+                            </c:choose>

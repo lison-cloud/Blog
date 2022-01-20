@@ -1,0 +1,24 @@
+<div class="user-card">
+                            <div class="user-card-info">
+                                <span class="user-card-username">
+                                    <c:out value="${user.userInfo.name} " /><c:out value="${user.userInfo.surname}" />
+                                </span>
+                                <span class="user-card-login">
+                                    @<c:out value="${user.login}" />
+                                </span>
+                            </div>
+                            <div class="user-card-tabs">
+                                <a href="<c:url value=''>
+                                    <c:param name='action' value='userProfile' />
+                                    <c:param name='userLogin' value='${user.login}' />
+                                    </c:url>" class="user-tabs-link"><fmt:message key="blog.profile" /></a>
+                                <a href="<c:url value=''>
+                                    <c:param name='action' value='userPost' />
+                                    <c:param name='userLogin' value='${user.login}' />
+                                    </c:url>" class="user-tabs-link"><fmt:message key="blog.posts" /></a>
+                                <a href="<c:url value=''>
+                                    <c:param name='action' value='userComment' />
+                                    <c:param name='userLogin' value='${user.login}' />
+                                    </c:url>" class="user-tabs-link"><fmt:message key="blog.comments" /></a>
+                            </div>
+                        </div>

@@ -1,0 +1,15 @@
+<div class="dropdown-language">
+                                <span class="language">
+                                    <fmt:message key="blog.language" />
+                                </span>
+                                <div class="dropdown-content">
+                                    <a href="<c:url value=''><c:param name='language' value='en' /></c:url>"
+                                        class="dropdown-link">
+                                        <fmt:message key="blog.en" />
+                                    </a>
+                                    <a href="<c:url value=''><c:param name='language' value='ru' /></c:url>"
+                                        class="dropdown-link">
+                                        <fmt:message key="blog.ru" />
+                                    </a>
+                                </div>
+                            </div>

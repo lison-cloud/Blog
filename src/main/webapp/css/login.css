@@ -1,0 +1,96 @@
+html, body {
+    height: 100%;
+}
+
+* {
+    font-family: 'Roboto Slab', serif;
+}
+
+
+a {
+    color: #555;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #00f0ee;
+}
+
+body {
+    display: flex;
+    background-color: #f1f1f1;
+}
+
+div.wrapper {
+    margin: auto;
+}
+
+div.container {
+    margin: auto;
+    width: 450px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #ffffff;
+}
+
+div.form-container label {
+    font-size: 1.2em;
+}
+
+div.form-container-title {
+    padding: 20px 0 40px 0;
+}
+
+div.form-language {
+    position: relative; 
+    float: right;
+    padding-top: 6px;
+}
+
+div.container span {
+    color: black;
+}
+
+span.form-title {
+    font-size: 1.5em;
+}
+
+div.form-failure-content {
+    width: 100%;
+    padding: 5px 0;
+    text-align: center;
+    color: red;
+}
+
+div.form-container-bottom {
+    width: 100%;
+    padding: 10px 0 0 0;
+    text-align: center;
+}
+
+input {
+    font-size: 1em;
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[type="submit"] {
+    font-size: 1.2em;
+    width: 100%;
+    background-color: #303b44;
+    color: white;
+    padding: 10px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  input[type=submit]:hover {
+    background-color: #485f72;
+  }

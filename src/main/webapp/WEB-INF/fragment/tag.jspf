@@ -1,0 +1,18 @@
+<c:choose>
+                                                    <c:when test="${fn:length(post.tags)==0}">
+                                                        <b>No tags</b>>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <b>Tags:</b>
+                                                        <c:forEach items="${post.tags}" var="tag">
+                                                            <span class="post-tag">
+                                                                <a href="<c:url value=''>
+                                                                            <c:param name='action' value='relatedPost' />
+                                                                            <c:param name='tag' value='${tag.title}' />
+                                                                            </c:url>" class="post-tag-link">
+                                                                    <c:out value="${tag.title}" />
+                                                                </a>
+                                                            </span>
+                                                        </c:forEach>
+                                                    </c:otherwise>
+                                                </c:choose>

@@ -1,0 +1,62 @@
+<div class="navbar">
+            <div class="base-content-width">
+                <ul>
+                    <li><a href="<c:url value=''>
+                                    <c:param name='action' value='latestPost' />
+                                </c:url>" class="nav-link" style="padding: 8px 14px 8px 0;"><fmt:message key="blog.feed" /></a></li>
+                    <li><a href="<c:url value=''>
+                                        <c:param name='action' value='relatedPost' />
+                                        <c:param name='category' value='develop' />
+                                </c:url>" class="nav-link"><fmt:message key="blog.develop" />
+                        </a>
+                    </li>
+                    <li><a href="<c:url value=''>
+                                        <c:param name='action' value='relatedPost' />
+                                        <c:param name='category' value='admin' />
+                                </c:url>" class="nav-link"><fmt:message key="blog.admin" />
+                        </a>
+                    </li>
+                    <li><a href="<c:url value=''>
+                                        <c:param name='action' value='relatedPost' />
+                                        <c:param name='category' value='design' />
+                                </c:url>" class="nav-link"><fmt:message key="blog.design" />
+                        </a>
+                    </li>
+                    <c:choose>
+                        <c:when test="${login!=null}">
+                            <li style="float: right;" >
+                                <a href="<c:url value=''>
+                                            <c:param name='action' value='userHome' />
+                                        </c:url>" class="nav-link" style="padding-right:0;">${login}</a>
+                            </li>
+                            <li style="float:right;" >
+                                <a href="<c:url value=''>
+                                            <c:param name='action' value='changeProfileSettings' />
+                                        </c:url>" class="nav-link"><fmt:message key="blog.profsettings" />
+                                        </a>
+                            </li>
+                            <li style="float:right;" >
+                                <a href="<c:url value=''>
+                                            <c:param name='action' value='writePost' />
+                                        </c:url>" class="nav-link"><fmt:message key="blog.wpost" /></a>
+                            </li>
+                        </c:when>
+                        <c:otherwise>
+                            <li style="float: right;" >
+                                <a href="<c:url value=''>
+                                            <c:param name='action' value='login' />
+                                             </c:url>" class="nav-link" style="padding-right:0;">
+                                        <fmt:message key="blog.login" />
+                                </a>
+                            </li>
+                            <li style="float: right;" >
+                                <a href="<c:url value=''>
+                                            <c:param name='action' value='signin' />
+                                        </c:url>" class="nav-link"><fmt:message key="blog.signin" />
+                                </a>
+                            </li>
+                        </c:otherwise>
+                    </c:choose>
+                </ul>
+            </div>
+</div>

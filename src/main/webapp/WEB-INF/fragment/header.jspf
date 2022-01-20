@@ -1,0 +1,8 @@
+<div class="header">
+        <div class="header-title base-content-width">
+            <h1><a href="<c:url value='/' />" class="header-title title-link">Blog</a></h1>
+            <div class="header-language">
+                <%@ include file="/WEB-INF/fragment/language.jspf" %>
+            </div>
+        </div>
+</div>
