@@ -5,6 +5,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import by.bsuir.blog.action.Action;
 import by.bsuir.blog.dto.Post;
 import by.bsuir.blog.service.PostService;
@@ -14,6 +17,8 @@ import by.bsuir.blog.service.impl.PostServiceImpl;
 
 public class DefaultAction
         implements Action {
+
+    private static final Logger LOGGER = LogManager.getLogger(DefaultAction.class);
 
     private static Action instance;
 
@@ -39,9 +44,8 @@ public class DefaultAction
         List<Post> posts = null;
         try {
             posts = this.postService.getAll();
-        } catch (PostServiceException | ValidationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (PostServiceException e) {
+            LOGGER.error("Can't get posts",e);
         }
         request.setAttribute("posts", posts);
         return "/WEB-INF/pages/main.jsp";

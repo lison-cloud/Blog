@@ -5,6 +5,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import by.bsuir.blog.action.Action;
 import by.bsuir.blog.dto.Post;
 import by.bsuir.blog.dto.User;
@@ -18,7 +21,10 @@ import by.bsuir.blog.service.impl.UserServiceImpl;
 
 public class UserCommentAction
         implements Action {
-    private static String USER_LOGIN = "userLogin";
+
+    private static final Logger LOGGER = LogManager.getLogger(UserCommentAction.class);
+
+    private static final String USER_LOGIN = "userLogin";
 
     private static Action instance;
 
@@ -37,27 +43,24 @@ public class UserCommentAction
     private final UserService userService;
 
     private UserCommentAction() {
-            this.postService = PostServiceImpl.getInstance();
-            this.userService = UserServiceImpl.getInstance();
-        }
+        this.postService = PostServiceImpl.getInstance();
+        this.userService = UserServiceImpl.getInstance();
+    }
 
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) {
 
         String userLogin = (String) request.getParameter(USER_LOGIN);
 
-        if (userLogin == null || userLogin.length() == 0) {
-            return "/WEB-INF/pages/main.jsp";
-        }
         List<Post> posts = null;
         User user = null;
-
         try {
             user = this.userService.userByLogin(userLogin);
             posts = this.postService.postWithUserComment(userLogin);
-        } catch (UserServiceException | ValidationException | PostServiceException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (ValidationException e) {
+            return "/WEB-INF/pages/main.jsp";
+        } catch (UserServiceException | PostServiceException e) {
+            LOGGER.error(e);
         }
         request.setAttribute("user", user);
         request.setAttribute("posts", posts);

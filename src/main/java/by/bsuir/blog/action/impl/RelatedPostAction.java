@@ -5,6 +5,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import by.bsuir.blog.action.Action;
 import by.bsuir.blog.dto.Post;
 import by.bsuir.blog.service.PostService;
@@ -13,8 +16,10 @@ import by.bsuir.blog.service.impl.PostServiceImpl;
 public class RelatedPostAction
         implements Action {
 
-    private static String CATEGORY_SLUG = "category";
-    private static String TAG_TITLE = "tag";
+    private static final Logger LOGGER = LogManager.getLogger(RelatedPostAction.class);
+
+    private static final String CATEGORY_SLUG = "category";
+    private static final String TAG_TITLE = "tag";
 
     private static Action instance;
 
@@ -40,18 +45,18 @@ public class RelatedPostAction
 
         String categoryTitle = (String) request.getParameter(CATEGORY_SLUG);
         String tagTitle = (String) request.getParameter(TAG_TITLE);
-        
+
         List<Post> posts = null;
         try {
-            if (categoryTitle == null || categoryTitle.length()==0) {
+            if (categoryTitle == null || categoryTitle.length() == 0) {
                 posts = this.postService.tagPost(tagTitle);
-            }else if(tagTitle == null || tagTitle.length()==0) {
+            } else if (tagTitle == null || tagTitle.length() == 0) {
                 posts = this.postService.categoryPost(categoryTitle);
             } else {
                 return "/WEB-INF/pages/main.jsp";
-            }    
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         }
         request.setAttribute("posts", posts);
         return "/WEB-INF/pages/main.jsp";

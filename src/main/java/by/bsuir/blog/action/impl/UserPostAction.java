@@ -5,6 +5,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import by.bsuir.blog.action.Action;
 import by.bsuir.blog.dto.Post;
 import by.bsuir.blog.dto.User;
@@ -19,7 +22,9 @@ import by.bsuir.blog.service.impl.UserServiceImpl;
 public class UserPostAction
         implements Action {
 
-    private static String USER_LOGIN = "userLogin";
+    private static final Logger LOGGER = LogManager.getLogger(UserPostAction.class);
+
+    private static final String USER_LOGIN = "userLogin";
 
     private final PostService postService;
     private final UserService userService;
@@ -47,19 +52,16 @@ public class UserPostAction
 
         String userLogin = (String) request.getParameter(USER_LOGIN);
 
-        if (userLogin == null || userLogin.length() == 0) {
-            return "/WEB-INF/pages/main.jsp";
-        }
-
         User user = null;
         List<Post> posts = null;
 
         try {
             user = this.userService.userByLogin(userLogin);
             posts = this.postService.userPost(userLogin);
-        } catch (UserServiceException | ValidationException | PostServiceException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (ValidationException e) {
+            return "/WEB-INF/pages/main.jsp";
+        } catch (UserServiceException | PostServiceException e) {
+            LOGGER.error(e);
         }
 
         request.setAttribute("user", user);

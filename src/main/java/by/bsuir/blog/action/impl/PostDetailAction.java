@@ -3,6 +3,9 @@ package by.bsuir.blog.action.impl;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import by.bsuir.blog.action.Action;
 import by.bsuir.blog.dto.Post;
 import by.bsuir.blog.service.PostService;
@@ -13,7 +16,9 @@ import by.bsuir.blog.service.impl.PostServiceImpl;
 public class PostDetailAction
         implements Action {
 
-    private static String POST_SLUG = "postSlug";
+    private static final Logger LOGGER = LogManager.getLogger(PostDetailAction.class);
+
+    private static final String POST_SLUG = "postSlug";
 
     private static Action instance;
 
@@ -39,16 +44,13 @@ public class PostDetailAction
 
         String postSlug = (String) request.getParameter(POST_SLUG);
 
-        if (postSlug == null || postSlug.length() == 0) {
-            return "/WEB-INF/pages/main.jsp";
-        }
-
         Post post = null;
         try {
             post = this.postService.postBySlug(postSlug);
-        } catch (PostServiceException | ValidationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (ValidationException e) {
+            return "/WEB-INF/pages/main.jsp";
+        } catch (PostServiceException e) {
+            LOGGER.error(e);
         }
 
         request.setAttribute("post", post);

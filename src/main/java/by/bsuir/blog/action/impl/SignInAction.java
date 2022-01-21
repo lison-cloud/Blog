@@ -4,6 +4,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import by.bsuir.blog.action.Action;
 import by.bsuir.blog.dto.User;
 import by.bsuir.blog.service.UserService;
@@ -14,9 +17,11 @@ import by.bsuir.blog.service.impl.UserServiceImpl;
 public class SignInAction
         implements Action {
 
-    private static String EMAIL_PARAM = "email";
-    private static String LOGIN_PARAM = "login";
-    private static String PASSWD_PARAM = "password";
+    private static final Logger LOGGER = LogManager.getLogger(SignInAction.class);
+
+    private static final String EMAIL_PARAM = "email";
+    private static final String LOGIN_PARAM = "login";
+    private static final String PASSWD_PARAM = "password";
 
     private static Action instance;
 
@@ -49,26 +54,17 @@ public class SignInAction
         String login = (String) request.getParameter(LOGIN_PARAM);
         String email = (String) request.getParameter(EMAIL_PARAM);
         String passwd = (String) request.getParameter(PASSWD_PARAM);
-
-        if (login == null || passwd == null
-                || login.length() == 0 || passwd.length() == 0) {
-            return "/WEB-INF/pages/signin.jsp";
-        }
-
-        User user = new User();
-        user.setEmail(email);
-        user.setLogin(login);
-        user.setUserRole("user");
-
+        
+        User user = null;
         try {
             this.userService.registrate(user, passwd);
-        } catch (UserServiceException | ValidationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (ValidationException e) {
+            return "/WEB-INF/pages/signin.jsp";
+        } catch (UserServiceException e) {
+            LOGGER.error(e);
         }
 
-        session.setAttribute(LOGIN_PARAM, user.getLogin());
-
+        session.setAttribute(LOGIN_PARAM, login);
         return "/blog";
     }
 }
