@@ -51,20 +51,27 @@ public class SignInAction
             return "/blog";
         }
 
-        String login = (String) request.getParameter(LOGIN_PARAM);
         String email = (String) request.getParameter(EMAIL_PARAM);
+
+        if(email==null) {
+            return "/WEB-INF/pages/signin.jsp";
+        }
+
+        String login = (String) request.getParameter(LOGIN_PARAM);
         String passwd = (String) request.getParameter(PASSWD_PARAM);
         
         User user = null;
         try {
-            this.userService.registrate(user, passwd);
+            user = this.userService.registrate(email, login, passwd);
         } catch (ValidationException e) {
+            request.setAttribute("signin_failure", true);
+            request.setAttribute("failure_message", "Invalid data");
             return "/WEB-INF/pages/signin.jsp";
         } catch (UserServiceException e) {
             LOGGER.error(e);
         }
 
-        session.setAttribute(LOGIN_PARAM, login);
+        session.setAttribute(LOGIN_PARAM, user.getLogin());
         return "/blog";
     }
 }
