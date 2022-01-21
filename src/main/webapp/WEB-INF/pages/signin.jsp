@@ -22,14 +22,14 @@
                         </span>
                     </div>
                     <form action="<c:url value='' ><c:param name='action' value='signin' /></c:url>" method="post">
-                        <label for="login">E-mail</label>
-                        <input type="text" id="email" name="email" placeholder="Email">
-                        <label for="login">Login</label>
-                        <input type="text" id="login" name="login" placeholder="Login">
+                        <label for="login"><fmt:message key="blog.email" /></label>
+                        <input type="text" id="email" name="email" placeholder="Email" required>
+                        <label for="login"><fmt:message key="blog.userLogin" /></label>
+                        <input type="text" id="login" name="login" placeholder="Login" required>
                         <label for="passwd">
                             <fmt:message key="blog.passwd" />
                         </label>
-                        <input type="password" id="passwd" name="password" placeholder="Password">
+                        <input type="password" id="passwd" name="password" placeholder="<fmt:message key='blog.passwd' />" required>
                         <c:if test="${signin_failure}">
                             <div class="form-failure-content">
                                 <c:out value="${failure_message}" />
