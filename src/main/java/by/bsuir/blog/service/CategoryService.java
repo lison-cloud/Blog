@@ -7,7 +7,7 @@ import by.bsuir.blog.service.exception.CategoryServiceException;
 import by.bsuir.blog.service.exception.ValidationException;
 
 public interface CategoryService {
-    List<Category> getAll() throws ValidationException, CategoryServiceException;
+    List<Category> getAll() throws CategoryServiceException;
 
     Category get(long categoryId) throws ValidationException, CategoryServiceException;
 

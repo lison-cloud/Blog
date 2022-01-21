@@ -8,7 +8,7 @@ import by.bsuir.blog.service.exception.ValidationException;
 
 public interface PostService {
 
-    List<Post> getAll() throws ValidationException, PostServiceException;
+    List<Post> getAll() throws PostServiceException;
 
     List<Post> tagPost(String tag) throws ValidationException, PostServiceException;
 

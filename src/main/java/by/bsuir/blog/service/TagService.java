@@ -7,7 +7,7 @@ import by.bsuir.blog.service.exception.TagServiceException;
 import by.bsuir.blog.service.exception.ValidationException;
 
 public interface TagService {
-    List<Tag> getAll() throws ValidationException, TagServiceException;
+    List<Tag> getAll() throws TagServiceException;
 
     List<Tag> getPostTag(long postId) throws ValidationException, TagServiceException;
 
