@@ -14,7 +14,7 @@ public interface UserService {
 
     void save(User user) throws ValidationException, UserServiceException;
 
-    void registrate(User user, String newPasswd) throws ValidationException, UserServiceException;
+    User registrate(String email, String login, String passwd) throws ValidationException, UserServiceException;
 
     void changePassword(User user, String newPasswd) throws ValidationException, UserServiceException;
 

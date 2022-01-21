@@ -76,19 +76,25 @@ public class UserServiceImpl
     }
 
     @Override
-    public void registrate(User user, String newPasswd) throws ValidationException, UserServiceException {
-        ValidationUtil.isPresented(user);
-        ValidationUtil.isValidPassword(newPasswd);
+    public User registrate(String email, String login, String passwd) throws ValidationException, UserServiceException {
+        ValidationUtil.isValidEmail(email);
+        ValidationUtil.isValidLogin(login);
+        ValidationUtil.isValidPassword(passwd);
 
-        user.setHashPassword(this.authenticationUtil.createNewPassword(newPasswd));
+        User user = new User();
+
+        user.setEmail(email);
+        user.setLogin(login);
+        user.setHashPassword(
+                this.authenticationUtil.createNewPassword(passwd));
         user.setUserRole("user");
 
         UserInfo userInfo = new UserInfo();
         userInfo.setRegisteredAt(new Timestamp(Instant.now().toEpochMilli()));
 
         user.setUserInfo(userInfo);
-
         this.save(user);
+        return user;
     }
 
     @Override
