@@ -17,9 +17,11 @@ public class ActionFactoryImpl
     private static ActionFactory instance;
 
     public static ActionFactory getInstance() {
-        synchronized (ActionFactoryImpl.class) {
-            if (instance == null) {
-                instance = new ActionFactoryImpl();
+        if (instance == null) {
+            synchronized (ActionFactoryImpl.class) {
+                if (instance == null) {
+                    instance = new ActionFactoryImpl();
+                }
             }
         }
         return instance;
