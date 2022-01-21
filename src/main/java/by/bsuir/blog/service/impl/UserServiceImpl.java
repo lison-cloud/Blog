@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.NoSuchElementException;
 
+import org.apache.logging.log4j.Logger;
+
 import by.bsuir.blog.dto.User;
 import by.bsuir.blog.dto.UserInfo;
 import by.bsuir.blog.dto.UserRole;
@@ -26,6 +28,8 @@ import by.bsuir.blog.service.util.impl.AuthenticationUtilImpl;
 
 public class UserServiceImpl
         implements UserService {
+
+    private static final Logger LOGGER = LogManager.getLogger(UserServiceImpl.class);
 
     private static UserService instance;
 
@@ -64,12 +68,15 @@ public class UserServiceImpl
         UserEntity entity = null;
         try {
             entity = this.userRepository.getByEmail(email).get();
-        } catch (UserRepositoryException | NoSuchElementException e) {
+        } catch (NoSuchElementException e) {
+            throw new UserServiceException("No such user: " + email, e);
+        } catch (UserRepositoryException e) {
             throw new UserServiceException(e);
         }
 
         if (!this.authenticationUtil.authenticate(entity, passwd)) {
-            throw new UserServiceException("log failed for " + email);
+            LOGGER.warn("log failed for " + email);
+            return null;
         }
 
         return this.convertToUser(entity);
