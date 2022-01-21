@@ -51,19 +51,27 @@ public class LoginAction
         }
 
         String email = (String) request.getParameter(EMAIL_PARAM);
+
+        if (email == null) {
+            return "/WEB-INF/pages/login.jsp";
+        }
+
         String passwd = (String) request.getParameter(PASSWD_PARAM);
 
         User user = null;
         try {
             user = this.userService.authenticate(email, passwd);
         } catch (ValidationException e) {
+            request.setAttribute("login_failure", true);
+            request.setAttribute("failure_message", "Invalid data");
             return "/WEB-INF/pages/login.jsp";
         } catch (UserServiceException e) {
             LOGGER.error(e);
         }
 
         if (user == null) {
-            request.setAttribute("authentication_failure", true);
+            request.setAttribute("login_failure", true);
+            request.setAttribute("failure_message", "Wrong password");
             return "/WEB-INF/pages/login.jsp";
         }
 
