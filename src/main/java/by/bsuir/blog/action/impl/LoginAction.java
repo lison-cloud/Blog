@@ -23,6 +23,7 @@ public class LoginAction
 
     private static final String EMAIL_PARAM = "email";
     private static final String PASSWD_PARAM = "password";
+    private static final String LOGIN_PARAM = "login";
 
     private static Action instance;
 
@@ -48,7 +49,7 @@ public class LoginAction
 
         HttpSession session = request.getSession();
 
-        if (session.getAttribute(EMAIL_PARAM) != null) {
+        if (session.getAttribute(LOGIN_PARAM) != null) {
             return "/blog";
         }
 
@@ -77,7 +78,7 @@ public class LoginAction
             return "/WEB-INF/pages/login.jsp";
         }
 
-        session.setAttribute("login", user.get().getLogin());
+        session.setAttribute(LOGIN_PARAM, user.get().getLogin());
         return "/blog";
     }
 
