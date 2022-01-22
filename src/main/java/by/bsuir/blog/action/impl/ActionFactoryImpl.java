@@ -33,6 +33,7 @@ public class ActionFactoryImpl
         actions.put("", DefaultAction.getInstance());
         actions.put("latestpost", DefaultAction.getInstance());
         actions.put("login", LoginAction.getInstance());
+        actions.put("logout", LogoutAction.getInstance());
         actions.put("signin", SignInAction.getInstance());
         actions.put("postdetail", PostDetailAction.getInstance());
         actions.put("userprofile", UserProfileAction.getInstance());
