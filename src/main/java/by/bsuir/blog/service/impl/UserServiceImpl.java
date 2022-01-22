@@ -3,7 +3,9 @@ package by.bsuir.blog.service.impl;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import by.bsuir.blog.dto.User;
@@ -61,29 +63,31 @@ public class UserServiceImpl
     }
 
     @Override
-    public User authenticate(String email, String passwd) throws ValidationException, UserServiceException {
+    public Optional<User> authenticate(String email, String passwd) throws ValidationException, UserServiceException {
         ValidationUtil.isValidEmail(email);
         ValidationUtil.isValidPassword(passwd);
 
         UserEntity entity = null;
         try {
-            entity = this.userRepository.getByEmail(email).get();
-        } catch (NoSuchElementException e) {
-            throw new UserServiceException("No such user: " + email, e);
+            Optional<UserEntity> eOptional = this.userRepository.getByEmail(email);
+            if (!eOptional.isPresent())
+                return Optional.empty();
+            entity = eOptional.get();
         } catch (UserRepositoryException e) {
             throw new UserServiceException(e);
         }
 
         if (!this.authenticationUtil.authenticate(entity, passwd)) {
             LOGGER.warn("log failed for " + email);
-            return null;
+            return Optional.empty();
         }
 
-        return this.convertToUser(entity);
+        return Optional.of(this.convertToUser(entity));
     }
 
     @Override
-    public User registrate(String email, String login, String passwd) throws ValidationException, UserServiceException {
+    public Optional<User> registrate(String email, String login, String passwd)
+            throws ValidationException, UserServiceException {
         ValidationUtil.isValidEmail(email);
         ValidationUtil.isValidLogin(login);
         ValidationUtil.isValidPassword(passwd);
@@ -100,21 +104,27 @@ public class UserServiceImpl
         userInfo.setRegisteredAt(new Timestamp(Instant.now().toEpochMilli()));
 
         user.setUserInfo(userInfo);
-        this.save(user);
-        return user;
+
+        if (!this.save(user))
+            return Optional.empty();
+
+        return Optional.of(user);
     }
 
     @Override
-    public User userByLogin(String userLogin) throws ValidationException, UserServiceException {
+    public Optional<User> userByLogin(String userLogin) throws ValidationException, UserServiceException {
         ValidationUtil.isValidLogin(userLogin);
 
         UserEntity entity = null;
         try {
-            entity = this.userRepository.getByLogin(userLogin).get();
-        } catch (UserRepositoryException | NoSuchElementException e) {
+            Optional<UserEntity> eOptional = this.userRepository.getByLogin(userLogin);
+            if (!eOptional.isPresent())
+                return Optional.empty();
+            entity = eOptional.get();
+        } catch (UserRepositoryException e) {
             throw new UserServiceException(e);
         }
-        return this.convertToUser(entity);
+        return Optional.of(this.convertToUser(entity));
     }
 
     private User convertToUser(UserEntity entity) throws UserServiceException {
@@ -162,18 +172,34 @@ public class UserServiceImpl
     }
 
     @Override
-    public void save(User user) throws ValidationException, UserServiceException {
+    public boolean save(User user) throws ValidationException, UserServiceException {
         ValidationUtil.isPresented(user);
+
+        if (!this.isUserEmailAndLoginUnique(user))
+            return false;
 
         UserEntity entity = this.convertToUserEntity(user);
         try {
             entity.setUserInfoId(
                     this.userInfoService.save(user.getUserInfo()));
             this.userRepository.add(entity);
-
         } catch (UserInfoServiceException | RepositoryException e) {
             throw new UserServiceException(e);
         }
+        return true;
+    }
+
+    private boolean isUserEmailAndLoginUnique(User user) throws UserServiceException {
+
+        Optional<UserEntity> entity;
+        try {
+            entity = this.userRepository.getByEmail(user.getEmail());
+            if (!entity.isPresent())
+                entity = this.userRepository.getByLogin(user.getLogin());
+        } catch (UserRepositoryException e) {
+            throw new UserServiceException(e);
+        }
+        return !entity.isPresent();
     }
 
     @Override
@@ -204,16 +230,19 @@ public class UserServiceImpl
     }
 
     @Override
-    public User userByEmail(String userEmail) throws ValidationException, UserServiceException {
+    public Optional<User> userByEmail(String userEmail) throws ValidationException, UserServiceException {
         ValidationUtil.isValidEmail(userEmail);
 
         UserEntity entity = null;
         try {
-            entity = this.userRepository.getByEmail(userEmail).get();
-        } catch (UserRepositoryException e) {
+            Optional<UserEntity> eOptional = this.userRepository.getByEmail(userEmail);
+            if(!eOptional.isPresent())
+                return Optional.empty();
+            entity = eOptional.get();
+        }catch (UserRepositoryException e) {
             throw new UserServiceException(e);
         }
-        return this.convertToUser(entity);
+        return Optional.of(this.convertToUser(entity));
     }
 
     @Override

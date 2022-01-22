@@ -1,20 +1,22 @@
 package by.bsuir.blog.service;
 
+import java.util.Optional;
+
 import by.bsuir.blog.dto.User;
 import by.bsuir.blog.service.exception.UserServiceException;
 import by.bsuir.blog.service.exception.ValidationException;
 
 public interface UserService {
 
-    User authenticate(String email, String passwd) throws ValidationException, UserServiceException;
+    Optional<User> authenticate(String email, String passwd) throws ValidationException, UserServiceException;
 
-    User userByEmail(String userEmail) throws ValidationException, UserServiceException;
+    Optional<User> userByEmail(String userEmail) throws ValidationException, UserServiceException;
 
-    User userByLogin(String userLogin) throws ValidationException, UserServiceException;
+    Optional<User> userByLogin(String userLogin) throws ValidationException, UserServiceException;
 
-    void save(User user) throws ValidationException, UserServiceException;
+    boolean save(User user) throws ValidationException, UserServiceException;
 
-    User registrate(String email, String login, String passwd) throws ValidationException, UserServiceException;
+    Optional<User> registrate(String email, String login, String passwd) throws ValidationException, UserServiceException;
 
     void changePassword(User user, String newPasswd) throws ValidationException, UserServiceException;
 
