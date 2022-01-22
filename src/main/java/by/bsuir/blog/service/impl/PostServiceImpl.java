@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import by.bsuir.blog.dto.Post;
 import by.bsuir.blog.entities.PostEntity;
@@ -113,12 +114,15 @@ public class PostServiceImpl
     }
 
     @Override
-    public Post postBySlug(String slug) throws ValidationException, PostServiceException {
+    public Optional<Post> postBySlug(String slug) throws ValidationException, PostServiceException {
         ValidationUtil.isZeroLength(slug);
 
         Post post = null;
         try {
-            PostEntity entity = this.postRepository.getBySlug(slug).get();
+            Optional<PostEntity> eOptional = this.postRepository.getBySlug(slug);
+            if(!eOptional.isPresent())
+                return Optional.empty();
+            PostEntity entity = eOptional.get();
             post = this.convertToPost(entity);
             post.setUserLogin(
                     this.userRepository.find(entity.getUserId()).get().getLogin());
@@ -127,7 +131,7 @@ public class PostServiceImpl
         } catch (RepositoryException | PostCommentServiceException e) {
             throw new PostServiceException(e);
         }
-        return post;
+        return Optional.of(post);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package by.bsuir.blog.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import by.bsuir.blog.dto.Post;
 import by.bsuir.blog.service.exception.PostServiceException;
@@ -18,7 +19,7 @@ public interface PostService {
 
     List<Post> userPost(String login) throws ValidationException, PostServiceException;
 
-    Post postBySlug(String slug) throws ValidationException, PostServiceException;
+    Optional<Post> postBySlug(String slug) throws ValidationException, PostServiceException;
 
     void save(Post post) throws ValidationException, PostServiceException;
 
