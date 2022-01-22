@@ -1,5 +1,7 @@
 package by.bsuir.blog.action.impl;
 
+import java.util.Optional;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,7 +46,7 @@ public class PostDetailAction
 
         String postSlug = (String) request.getParameter(POST_SLUG);
 
-        Post post = null;
+        Optional<Post> post = null;
         try {
             post = this.postService.postBySlug(postSlug);
         } catch (ValidationException e) {
@@ -53,7 +55,10 @@ public class PostDetailAction
             LOGGER.error(e);
         }
 
-        request.setAttribute("post", post);
+        if (!post.isPresent())
+            return "/WEB-INF/pages/main.jsp";
+
+        request.setAttribute("post", post.get());
         return "/WEB-INF/pages/postDetail.jsp";
     }
 
