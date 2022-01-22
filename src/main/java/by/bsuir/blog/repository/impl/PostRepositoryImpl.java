@@ -113,7 +113,7 @@ public class PostRepositoryImpl
         }
 
         @Override
-        public List<PostEntity> getAllOrderByPublishedDate(boolean asc) throws PostRepositoryException {
+        public List<PostEntity> latestPost() throws PostRepositoryException {
                 CriteriaBuilder cb = this.entityManager.criteriaBuilder();
                 CriteriaSelect<PostEntity> cs = cb.createSelect(this.table);
 

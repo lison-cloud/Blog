@@ -13,7 +13,7 @@ public interface PostRepository
 
     Optional<PostEntity> getBySlug(String slug) throws PostRepositoryException;
 
-    List<PostEntity> getAllOrderByPublishedDate(boolean asc) throws PostRepositoryException;
+    List<PostEntity> latestPost() throws PostRepositoryException;
 
     List<PostEntity> getPostWithUserComment(String login) throws PostRepositoryException;
 
