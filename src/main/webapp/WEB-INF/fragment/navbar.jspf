@@ -31,7 +31,13 @@
                             </li>
                             <li style="float:right;" >
                                 <a href="<c:url value=''>
-                                            <c:param name='action' value='changeProfileSettings' />
+                                            <c:param name='action' value='logout' />
+                                        </c:url>" class="nav-link"><fmt:message key="blog.logout" />
+                                        </a>
+                            </li>
+                            <li style="float:right;" >
+                                <a href="<c:url value=''>
+                                            <c:param name='action' value='changeSettings' />
                                         </c:url>" class="nav-link"><fmt:message key="blog.profsettings" />
                                         </a>
                             </li>
