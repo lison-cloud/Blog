@@ -76,6 +76,22 @@ public class PostServiceImpl
     }
 
     @Override
+    public List<Post> latestPost() throws PostServiceException {
+        List<Post> posts = new ArrayList<>();
+        try {
+            for (PostEntity p : this.postRepository.latestPost()) {
+                Post post = this.convertToPost(p);
+                post.setUserLogin(
+                        this.userRepository.find(p.getUserId()).get().getLogin());
+                posts.add(post);
+            }
+        } catch (RepositoryException | ValidationException e) {
+            throw new PostServiceException(e);
+        }
+        return posts;
+    }
+
+    @Override
     public List<Post> postWithUserComment(String login) throws ValidationException, PostServiceException {
         ValidationUtil.isValidLogin(login);
 
@@ -120,7 +136,7 @@ public class PostServiceImpl
         Post post = null;
         try {
             Optional<PostEntity> eOptional = this.postRepository.getBySlug(slug);
-            if(!eOptional.isPresent())
+            if (!eOptional.isPresent())
                 return Optional.empty();
             PostEntity entity = eOptional.get();
             post = this.convertToPost(entity);

@@ -11,6 +11,8 @@ public interface PostService {
 
     List<Post> getAll() throws PostServiceException;
 
+    List<Post> latestPost() throws PostServiceException;
+
     List<Post> tagPost(String tag) throws ValidationException, PostServiceException;
 
     List<Post> categoryPost(String categoryTitle) throws ValidationException, PostServiceException;
