@@ -1,5 +1,7 @@
 package by.bsuir.blog.action.impl;
 
+import java.util.Optional;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -58,7 +60,7 @@ public class LoginAction
 
         String passwd = (String) request.getParameter(PASSWD_PARAM);
 
-        User user = null;
+        Optional<User> user = null;
         try {
             user = this.userService.authenticate(email, passwd);
         } catch (ValidationException e) {
@@ -69,13 +71,13 @@ public class LoginAction
             LOGGER.error(e);
         }
 
-        if (user == null) {
+        if (!user.isPresent()) {
             request.setAttribute("login_failure", true);
             request.setAttribute("failure_message", "Wrong password");
             return "/WEB-INF/pages/login.jsp";
         }
 
-        session.setAttribute("login", user.getLogin());
+        session.setAttribute("login", user.get().getLogin());
         return "/blog";
     }
 

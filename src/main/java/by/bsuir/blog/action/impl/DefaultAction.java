@@ -12,7 +12,6 @@ import by.bsuir.blog.action.Action;
 import by.bsuir.blog.dto.Post;
 import by.bsuir.blog.service.PostService;
 import by.bsuir.blog.service.exception.PostServiceException;
-import by.bsuir.blog.service.exception.ValidationException;
 import by.bsuir.blog.service.impl.PostServiceImpl;
 
 public class DefaultAction

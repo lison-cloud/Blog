@@ -1,6 +1,7 @@
 package by.bsuir.blog.action.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -53,16 +54,19 @@ public class UserCommentAction
         String userLogin = (String) request.getParameter(USER_LOGIN);
 
         List<Post> posts = null;
-        User user = null;
+        Optional<User> user = null;
         try {
             user = this.userService.userByLogin(userLogin);
+            if (!user.isPresent())
+                return "/WEB-INF/pages/main.jsp";
             posts = this.postService.postWithUserComment(userLogin);
         } catch (ValidationException e) {
             return "/WEB-INF/pages/main.jsp";
         } catch (UserServiceException | PostServiceException e) {
             LOGGER.error(e);
         }
-        request.setAttribute("user", user);
+
+        request.setAttribute("user", user.get());
         request.setAttribute("posts", posts);
         return "/WEB-INF/pages/userComment.jsp";
     }

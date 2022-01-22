@@ -1,5 +1,7 @@
 package by.bsuir.blog.action.impl;
 
+import java.util.Optional;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,7 +46,7 @@ public class UserProfileAction
 
         String userLogin = (String) request.getParameter(USER_LOGIN);
 
-        User user = null;
+        Optional<User> user = null;
         try {
             user = this.userService.userByLogin(userLogin);
         } catch (ValidationException e) {
@@ -53,7 +55,10 @@ public class UserProfileAction
             LOGGER.error(e);
         }
 
-        request.setAttribute("user", user);
+        if (!user.isPresent())
+            return "/WEB-INF/pages/main.jsp";
+
+        request.setAttribute("user", user.get());
         return "/WEB-INF/pages/userProfile.jsp";
     }
 

@@ -1,5 +1,7 @@
 package by.bsuir.blog.action.impl;
 
+import java.util.Optional;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -60,7 +62,7 @@ public class SignInAction
         String login = (String) request.getParameter(LOGIN_PARAM);
         String passwd = (String) request.getParameter(PASSWD_PARAM);
         
-        User user = null;
+        Optional<User> user = null;
         try {
             user = this.userService.registrate(email, login, passwd);
         } catch (ValidationException e) {
@@ -71,7 +73,13 @@ public class SignInAction
             LOGGER.error(e);
         }
 
-        session.setAttribute(LOGIN_PARAM, user.getLogin());
+        if(!user.isPresent()) {
+            request.setAttribute("signin_failure", true);
+            request.setAttribute("failure_message", "user with that email|login exists");
+            return "/WEB-INF/pages/signin.jsp";
+        }
+
+        session.setAttribute(LOGIN_PARAM, user.get().getLogin());
         return "/blog";
     }
 }
