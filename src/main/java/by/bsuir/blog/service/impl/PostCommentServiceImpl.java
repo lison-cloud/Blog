@@ -46,14 +46,13 @@ public class PostCommentServiceImpl
     @Override
     public List<PostComment> getPostComment(long postId) throws ValidationException, PostCommentServiceException {
         ValidationUtil.isZeroOrLess(postId);
-        List<PostComment> comments = new ArrayList<>();
         try {
-            this.postCommentRepository.getByPostId(postId).forEach(
-                    e -> comments.add(this.convertToPostComment(e)));
+            return this.postCommentRepository.getByPostId(postId).stream()
+                    .map(this::convertToPostComment)
+                    .collect(Collectors.toList());
         } catch (PostCommentRepositoryException e) {
             throw new PostCommentServiceException(e);
         }
-        return comments;
     }
 
     @Override
