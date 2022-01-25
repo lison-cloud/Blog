@@ -4,13 +4,16 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import by.bsuir.blog.dto.PostComment;
 import by.bsuir.blog.entities.PostCommentEntity;
 import by.bsuir.blog.repository.PostCommentRepository;
+import by.bsuir.blog.repository.PostRepository;
 import by.bsuir.blog.repository.exception.PostCommentRepositoryException;
 import by.bsuir.blog.repository.exception.RepositoryException;
 import by.bsuir.blog.repository.impl.PostCommentRepositoryImpl;
+import by.bsuir.blog.repository.impl.PostRepositoryImpl;
 import by.bsuir.blog.service.PostCommentService;
 import by.bsuir.blog.service.exception.PostCommentServiceException;
 import by.bsuir.blog.service.exception.ValidationException;
@@ -32,18 +35,20 @@ public class PostCommentServiceImpl
         return instance;
     }
 
+    private final PostRepository postRepository;
     private final PostCommentRepository postCommentRepository;
 
     private PostCommentServiceImpl() {
+        this.postRepository = PostRepositoryImpl.getInstance();
         this.postCommentRepository = PostCommentRepositoryImpl.getInstance();
     }
 
     @Override
-    public List<PostComment> postComment(long postId) throws ValidationException, PostCommentServiceException {
+    public List<PostComment> getPostComment(long postId) throws ValidationException, PostCommentServiceException {
         ValidationUtil.isZeroOrLess(postId);
         List<PostComment> comments = new ArrayList<>();
         try {
-            this.postCommentRepository.findByPostId(postId).forEach(
+            this.postCommentRepository.getByPostId(postId).forEach(
                     e -> comments.add(this.convertToPostComment(e)));
         } catch (PostCommentRepositoryException e) {
             throw new PostCommentServiceException(e);
@@ -52,19 +57,17 @@ public class PostCommentServiceImpl
     }
 
     @Override
-    public List<PostComment> findByPostAndUser(long postId, String login)
+    public List<PostComment> getPostUserComment(long postId, String login)
             throws ValidationException, PostCommentServiceException {
         ValidationUtil.isZeroOrLess(postId);
         ValidationUtil.isPresented(login);
 
-        List<PostComment> comments = new ArrayList<>();
         try {
-            this.postCommentRepository.findByPostIdAndUserLogin(postId, login).forEach(
-                    e -> comments.add(this.convertToPostComment(e)));
+            return this.postCommentRepository.getByPostIdAndUserLogin(postId, login).stream()
+                    .map(this::convertToPostComment).collect(Collectors.toList());
         } catch (PostCommentRepositoryException e) {
             throw new PostCommentServiceException(e);
         }
-        return comments;
     }
 
     private PostComment convertToPostComment(PostCommentEntity entity) {
@@ -91,6 +94,26 @@ public class PostCommentServiceImpl
 
         PostCommentEntity entity = this.convertPostCommentEntity(comment);
         entity.setPostId(postId);
+        this.save0(entity);
+    }
+
+    @Override
+    public void save(PostComment comment, String postSlug) throws ValidationException, PostCommentServiceException {
+        ValidationUtil.isPresented(comment);
+        ValidationUtil.isZeroLength(postSlug);
+
+        PostCommentEntity entity = this.convertPostCommentEntity(comment);
+        try {
+            entity.setPostId(
+                    this.postRepository.getBySlug(postSlug)
+                            .orElseThrow(PostCommentServiceException::new).getId());
+            this.save0(entity);
+        } catch (RepositoryException e) {
+            throw new PostCommentServiceException(e);
+        }
+    }
+
+    private void save0(PostCommentEntity entity) throws PostCommentServiceException {
         entity.setPublishedAt(
                 new Timestamp(Instant.now().toEpochMilli()));
         try {

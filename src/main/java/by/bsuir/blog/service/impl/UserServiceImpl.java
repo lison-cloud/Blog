@@ -2,7 +2,6 @@ package by.bsuir.blog.service.impl;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -69,10 +68,7 @@ public class UserServiceImpl
 
         UserEntity entity = null;
         try {
-            Optional<UserEntity> eOptional = this.userRepository.getByEmail(email);
-            if (!eOptional.isPresent())
-                return Optional.empty();
-            entity = eOptional.get();
+            entity = this.userRepository.getByEmail(email).orElseThrow(UserServiceException::new);
         } catch (UserRepositoryException e) {
             throw new UserServiceException(e);
         }
@@ -104,23 +100,16 @@ public class UserServiceImpl
         userInfo.setRegisteredAt(new Timestamp(Instant.now().toEpochMilli()));
 
         user.setUserInfo(userInfo);
-
-        if (!this.save(user))
-            return Optional.empty();
-
-        return Optional.of(user);
+        return this.save(user) ? Optional.of(user) : Optional.empty();
     }
 
     @Override
-    public Optional<User> userByLogin(String userLogin) throws ValidationException, UserServiceException {
+    public Optional<User> getByLogin(String userLogin) throws ValidationException, UserServiceException {
         ValidationUtil.isValidLogin(userLogin);
 
         UserEntity entity = null;
         try {
-            Optional<UserEntity> eOptional = this.userRepository.getByLogin(userLogin);
-            if (!eOptional.isPresent())
-                return Optional.empty();
-            entity = eOptional.get();
+            entity = this.userRepository.getByLogin(userLogin).orElseThrow(UserServiceException::new);
         } catch (UserRepositoryException e) {
             throw new UserServiceException(e);
         }
@@ -136,7 +125,7 @@ public class UserServiceImpl
 
         UserInfo userInfo = null;
         try {
-            userInfo = this.userInfoService.get(entity.getUserInfoId());
+            userInfo = this.userInfoService.get(entity.getUserInfoId()).orElseThrow(UserServiceException::new);
         } catch (UserInfoServiceException | ValidationException e) {
             throw new UserServiceException("userinfo for: " + user.getEmail(), e);
         }
@@ -145,7 +134,7 @@ public class UserServiceImpl
 
         UserRole role = null;
         try {
-            role = this.userRoleRepository.find(entity.getUserRoleId()).get();
+            role = this.userRoleRepository.find(entity.getUserRoleId()).orElseThrow(UserServiceException::new);
         } catch (RepositoryException e) {
             new UserServiceException("user role for: " + user.getEmail(), e);
         }
@@ -163,11 +152,10 @@ public class UserServiceImpl
         try {
             entity.setUserRoleId(
                     this.userRoleRepository.getByRole(
-                            user.getUserRole()).get().getId());
+                            user.getUserRole()).orElseThrow(UserServiceException::new).getId());
         } catch (UserRoleRepositoryException e) {
             throw new UserServiceException(e);
         }
-
         return entity;
     }
 
@@ -207,7 +195,6 @@ public class UserServiceImpl
         ValidationUtil.isPresented(user);
 
         UserEntity entity = this.convertToUserEntity(user);
-
         try {
             this.userInfoService.update(user.getUserInfo());
             this.userRepository.update(entity);
@@ -223,23 +210,19 @@ public class UserServiceImpl
         try {
             this.userRepository.removeById(user.getId());
             this.userInfoService.delete(user.getUserInfo().getId());
-
         } catch (RepositoryException | UserInfoServiceException e) {
             throw new UserServiceException(e);
         }
     }
 
     @Override
-    public Optional<User> userByEmail(String userEmail) throws ValidationException, UserServiceException {
+    public Optional<User> getByEmail(String userEmail) throws ValidationException, UserServiceException {
         ValidationUtil.isValidEmail(userEmail);
 
         UserEntity entity = null;
         try {
-            Optional<UserEntity> eOptional = this.userRepository.getByEmail(userEmail);
-            if(!eOptional.isPresent())
-                return Optional.empty();
-            entity = eOptional.get();
-        }catch (UserRepositoryException e) {
+            entity = this.userRepository.getByEmail(userEmail).orElseThrow(UserServiceException::new);
+        } catch (UserRepositoryException e) {
             throw new UserServiceException(e);
         }
         return Optional.of(this.convertToUser(entity));
@@ -250,7 +233,8 @@ public class UserServiceImpl
         ValidationUtil.isPresented(user);
         ValidationUtil.isValidPassword(newPasswd);
 
-        user.setHashPassword(this.authenticationUtil.createNewPassword(newPasswd));
+        user.setHashPassword(
+                this.authenticationUtil.createNewPassword(newPasswd));
         this.update(user);
     }
 

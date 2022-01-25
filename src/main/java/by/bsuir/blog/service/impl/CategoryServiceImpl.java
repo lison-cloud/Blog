@@ -1,6 +1,7 @@
 package by.bsuir.blog.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import by.bsuir.blog.dto.Category;
 import by.bsuir.blog.repository.CategoryRepository;
@@ -73,10 +74,20 @@ public class CategoryServiceImpl
     }
 
     @Override
-    public Category get(long categoryId) throws ValidationException, CategoryServiceException {
+    public Optional<Category> get(long categoryId) throws ValidationException, CategoryServiceException {
         ValidationUtil.isZeroOrLess(categoryId);
         try {
-            return this.categoryRepository.find(categoryId).get();
+            return this.categoryRepository.find(categoryId);
+        } catch (RepositoryException e) {
+            throw new CategoryServiceException(e);
+        }
+    }
+
+    @Override
+    public Optional<Category> getBySlug(String slug) throws ValidationException, CategoryServiceException {
+        ValidationUtil.isZeroLength(slug);
+        try {
+            return this.categoryRepository.getBySlug(slug);
         } catch (RepositoryException e) {
             throw new CategoryServiceException(e);
         }

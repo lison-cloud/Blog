@@ -5,6 +5,11 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
+import com.oracle.wls.shaded.org.apache.xpath.functions.Function;
 
 import by.bsuir.blog.dto.Post;
 import by.bsuir.blog.entities.PostEntity;
@@ -66,7 +71,8 @@ public class PostServiceImpl
             for (PostEntity p : this.postRepository.getAll()) {
                 Post post = this.convertToPost(p);
                 post.setUserLogin(
-                        this.userRepository.find(p.getUserId()).get().getLogin());
+                        this.userRepository.find(p.getUserId())
+                                .orElseThrow(PostServiceException::new).getLogin());
                 posts.add(post);
             }
         } catch (RepositoryException | ValidationException e) {
@@ -76,13 +82,14 @@ public class PostServiceImpl
     }
 
     @Override
-    public List<Post> latestPost() throws PostServiceException {
+    public List<Post> getLatestPost() throws PostServiceException {
         List<Post> posts = new ArrayList<>();
         try {
-            for (PostEntity p : this.postRepository.latestPost()) {
+            for (PostEntity p : this.postRepository.getLatestPost()) {
                 Post post = this.convertToPost(p);
                 post.setUserLogin(
-                        this.userRepository.find(p.getUserId()).get().getLogin());
+                        this.userRepository.find(p.getUserId())
+                                .orElseThrow(PostServiceException::new).getLogin());
                 posts.add(post);
             }
         } catch (RepositoryException | ValidationException e) {
@@ -92,7 +99,7 @@ public class PostServiceImpl
     }
 
     @Override
-    public List<Post> postWithUserComment(String login) throws ValidationException, PostServiceException {
+    public List<Post> getWithUserComment(String login) throws ValidationException, PostServiceException {
         ValidationUtil.isValidLogin(login);
 
         List<Post> posts = new ArrayList<>();
@@ -100,8 +107,9 @@ public class PostServiceImpl
             for (PostEntity p : this.postRepository.getPostWithUserComment(login)) {
                 Post post = new Post();
                 post.setTitle(p.getTitle());
+                post.setSlug(p.getSlug());
                 post.setComments(
-                        this.postCommentService.findByPostAndUser(p.getId(), login));
+                        this.postCommentService.getPostUserComment(p.getId(), login));
                 posts.add(post);
             }
         } catch (PostRepositoryException | PostCommentServiceException e) {
@@ -111,7 +119,7 @@ public class PostServiceImpl
     }
 
     @Override
-    public List<Post> userPost(String login) throws ValidationException, PostServiceException {
+    public List<Post> getUserPost(String login) throws ValidationException, PostServiceException {
         ValidationUtil.isValidLogin(login);
 
         List<Post> posts = new ArrayList<>();
@@ -125,12 +133,30 @@ public class PostServiceImpl
         } catch (RepositoryException e) {
             throw new PostServiceException(e);
         }
+        return posts;
+    }
+
+    @Override
+    public List<Post> getPublishedUserPost(String login) throws ValidationException, PostServiceException {
+        ValidationUtil.isValidLogin(login);
+
+        List<Post> posts = new ArrayList<>();
+        try {
+            UserEntity user = this.userRepository.getByLogin(login).get();
+            for (PostEntity p : this.postRepository.getPublishedByUserId(user.getId())) {
+                Post post = this.convertToPost(p);
+                post.setUserLogin(user.getLogin());
+                posts.add(post);
+            }
+        } catch (RepositoryException e) {
+            throw new PostServiceException(e);
+        }
 
         return posts;
     }
 
     @Override
-    public Optional<Post> postBySlug(String slug) throws ValidationException, PostServiceException {
+    public Optional<Post> getBySlug(String slug) throws ValidationException, PostServiceException {
         ValidationUtil.isZeroLength(slug);
 
         Post post = null;
@@ -143,7 +169,7 @@ public class PostServiceImpl
             post.setUserLogin(
                     this.userRepository.find(entity.getUserId()).get().getLogin());
             post.setComments(
-                    this.postCommentService.postComment(entity.getId()));
+                    this.postCommentService.getPostComment(entity.getId()));
         } catch (RepositoryException | PostCommentServiceException e) {
             throw new PostServiceException(e);
         }
@@ -166,14 +192,19 @@ public class PostServiceImpl
     @Override
     public void save(Post post) throws ValidationException, PostServiceException {
         ValidationUtil.isPresented(post);
+
+        Timestamp stamp = new Timestamp(Instant.now().toEpochMilli());
+        if (post.isPublished()) {
+            post.setCreatedAt(stamp);
+            post.setPublishedAt(stamp);
+        } else {
+            post.setCreatedAt(stamp);
+        }
         PostEntity entity = this.convertToPostEntity(post);
-
-        entity.setPublishedAt(
-                new Timestamp(Instant.now().toEpochMilli()));
-
         try {
-            this.postRepository.add(entity);
-        } catch (RepositoryException e) {
+            post.setId(this.postRepository.add(entity));
+            this.tagService.addPostTag(post.getId(), post.getTags());
+        } catch (RepositoryException | TagServiceException e) {
             throw new PostServiceException(e);
         }
     }
@@ -203,9 +234,10 @@ public class PostServiceImpl
 
         try {
             post.setCategory(
-                    this.categoryRepository.find(entity.getCategoryId()).get());
-            post.setTags(
-                    this.tagService.getPostTag(post.getId()));
+                    this.categoryRepository.find(entity.getCategoryId()).orElseThrow(PostServiceException::new));
+            List<String> tag = this.tagService.getPostTag(post.getId()).stream().map(t -> t.getTitle())
+                    .collect(Collectors.toList());
+            post.setTags(tag);
         } catch (RepositoryException | TagServiceException e) {
             throw new PostServiceException(e);
         }
@@ -227,7 +259,8 @@ public class PostServiceImpl
 
         try {
             entity.setUserId(
-                    this.userRepository.getByLogin(post.getUserLogin()).get().getId());
+                    this.userRepository.getByLogin(post.getUserLogin())
+                            .orElseThrow(PostServiceException::new).getId());
         } catch (UserRepositoryException e) {
             throw new PostServiceException(e);
         }
@@ -238,7 +271,7 @@ public class PostServiceImpl
     }
 
     @Override
-    public List<Post> tagPost(String tag) throws ValidationException, PostServiceException {
+    public List<Post> getTagPost(String tag) throws ValidationException, PostServiceException {
         ValidationUtil.isZeroLength(tag);
 
         List<Post> posts = new ArrayList<>();
@@ -246,7 +279,7 @@ public class PostServiceImpl
             for (PostEntity p : this.postRepository.getByTag(tag)) {
                 Post post = this.convertToPost(p);
                 post.setUserLogin(
-                        this.userRepository.find(p.getUserId()).get().getLogin());
+                        this.userRepository.find(p.getUserId()).orElseThrow(PostServiceException::new).getLogin());
                 posts.add(post);
             }
         } catch (RepositoryException e) {
@@ -256,15 +289,15 @@ public class PostServiceImpl
     }
 
     @Override
-    public List<Post> categoryPost(String categoryTitle) throws ValidationException, PostServiceException {
+    public List<Post> getCategoryPost(String categoryTitle) throws ValidationException, PostServiceException {
         ValidationUtil.isZeroLength(categoryTitle);
 
         List<Post> posts = new ArrayList<>();
         try {
-            for (PostEntity p : this.postRepository.getAllByCategorySlug(categoryTitle)) {
+            for (PostEntity p : this.postRepository.getByCategorySlug(categoryTitle)) {
                 Post post = this.convertToPost(p);
                 post.setUserLogin(
-                        this.userRepository.find(p.getUserId()).get().getLogin());
+                        this.userRepository.find(p.getUserId()).orElseThrow(PostServiceException::new).getLogin());
                 posts.add(post);
             }
         } catch (RepositoryException e) {

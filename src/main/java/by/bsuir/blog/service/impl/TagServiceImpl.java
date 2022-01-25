@@ -1,6 +1,8 @@
 package by.bsuir.blog.service.impl;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import by.bsuir.blog.dto.Tag;
 import by.bsuir.blog.repository.TagRepository;
@@ -47,7 +49,7 @@ public class TagServiceImpl
     public List<Tag> getPostTag(long postId) throws ValidationException, TagServiceException {
         ValidationUtil.isZeroOrLess(postId);
         try {
-            return this.tagRepository.getAllByPostId(postId);
+            return this.tagRepository.getByPostId(postId);
         } catch (TagRepositoryException e) {
             throw new TagServiceException(e);
         }
@@ -84,19 +86,50 @@ public class TagServiceImpl
     }
 
     @Override
-    public void addTag(long postId, String tagTitle) throws ValidationException, TagServiceException {
+    public List<Tag> addPostTag(long postId, List<String> tag) throws ValidationException, TagServiceException {
         ValidationUtil.isZeroOrLess(postId);
-        ValidationUtil.isZeroLength(tagTitle);
+        ValidationUtil.isPresented(tag);
 
-        Tag tag = new Tag();
-        tag.setTitle(tagTitle);
+        List<Tag> tags = new LinkedList<>();
+        for (String t : tag) {
+            try {
+                Optional<Tag> oTag = this.tagRepository.getByTitle(t);
+                if (!oTag.isPresent())
+                    oTag = this.save(t);
+                if (oTag.isPresent()) {
+                    this.tagRepository.addPostTag(oTag.get().getId(), postId);
+                    tags.add(oTag.get());
+                }
+            } catch (Exception e) {
+                continue;
+            }
+        }
+        return tags;
+    }
+
+    @Override
+    public Optional<Tag> getByTitle(String title) throws ValidationException, TagServiceException {
+        ValidationUtil.isZeroLength(title);
 
         try {
-            long tagId = this.tagRepository.add(tag);
-            this.tagRepository.addTagToPost(tagId, postId);
+            return this.tagRepository.getByTitle(title);
+        } catch (TagRepositoryException e) {
+            throw new TagServiceException(e);
+        }
+    }
+
+    @Override
+    public Optional<Tag> save(String title) throws ValidationException, TagServiceException {
+        ValidationUtil.isZeroLength(title);
+
+        Tag tag = new Tag();
+        tag.setTitle(title);
+        try {
+            tag.setId(this.tagRepository.add(tag));
         } catch (RepositoryException e) {
             throw new TagServiceException(e);
         }
+        return Optional.ofNullable(tag);
     }
 
 }

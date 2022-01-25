@@ -8,12 +8,14 @@ import by.bsuir.blog.service.exception.ValidationException;
 
 public interface PostCommentService {
 
-    List<PostComment> postComment(long postId) throws ValidationException, PostCommentServiceException;
+    List<PostComment> getPostComment(long postId) throws ValidationException, PostCommentServiceException;
 
-    List<PostComment> findByPostAndUser(long postId, String login)
+    List<PostComment> getPostUserComment(long postId, String login)
             throws ValidationException, PostCommentServiceException;
 
     void save(PostComment postComment, long postId) throws ValidationException, PostCommentServiceException;
+
+    void save(PostComment postComment, String postSlug) throws ValidationException, PostCommentServiceException;
 
     void update(PostComment postComment) throws ValidationException, PostCommentServiceException;
 

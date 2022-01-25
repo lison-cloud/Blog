@@ -10,9 +10,9 @@ public interface UserService {
 
     Optional<User> authenticate(String email, String passwd) throws ValidationException, UserServiceException;
 
-    Optional<User> userByEmail(String userEmail) throws ValidationException, UserServiceException;
+    Optional<User> getByEmail(String userEmail) throws ValidationException, UserServiceException;
 
-    Optional<User> userByLogin(String userLogin) throws ValidationException, UserServiceException;
+    Optional<User> getByLogin(String userLogin) throws ValidationException, UserServiceException;
 
     boolean save(User user) throws ValidationException, UserServiceException;
 

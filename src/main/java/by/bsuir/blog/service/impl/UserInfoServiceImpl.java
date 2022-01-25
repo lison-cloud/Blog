@@ -1,6 +1,7 @@
 package by.bsuir.blog.service.impl;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import by.bsuir.blog.dto.UserInfo;
 import by.bsuir.blog.repository.UserInfoRepository;
@@ -34,15 +35,14 @@ public class UserInfoServiceImpl
     }
 
     @Override
-    public UserInfo get(long id) throws ValidationException, UserInfoServiceException {
+    public Optional<UserInfo> get(long id) throws ValidationException, UserInfoServiceException {
         ValidationUtil.isZeroOrLess(id);
-        UserInfo info = null;
+
         try {
-            info = this.userInfoRepository.find(id).get();
+            return this.userInfoRepository.find(id);
         } catch (RepositoryException | NoSuchElementException e) {
             throw new UserInfoServiceException(e);
         }
-        return info;
     }
 
     @Override

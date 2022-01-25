@@ -11,17 +11,19 @@ public interface PostService {
 
     List<Post> getAll() throws PostServiceException;
 
-    List<Post> latestPost() throws PostServiceException;
+    List<Post> getLatestPost() throws PostServiceException;
 
-    List<Post> tagPost(String tag) throws ValidationException, PostServiceException;
+    List<Post> getTagPost(String tag) throws ValidationException, PostServiceException;
 
-    List<Post> categoryPost(String categoryTitle) throws ValidationException, PostServiceException;
+    List<Post> getCategoryPost(String categoryTitle) throws ValidationException, PostServiceException;
 
-    List<Post> postWithUserComment(String login) throws ValidationException, PostServiceException;
+    List<Post> getWithUserComment(String login) throws ValidationException, PostServiceException;
 
-    List<Post> userPost(String login) throws ValidationException, PostServiceException;
+    List<Post> getUserPost(String login) throws ValidationException, PostServiceException;
 
-    Optional<Post> postBySlug(String slug) throws ValidationException, PostServiceException;
+    List<Post> getPublishedUserPost(String login) throws ValidationException, PostServiceException;
+
+    Optional<Post> getBySlug(String slug) throws ValidationException, PostServiceException;
 
     void save(Post post) throws ValidationException, PostServiceException;
 
