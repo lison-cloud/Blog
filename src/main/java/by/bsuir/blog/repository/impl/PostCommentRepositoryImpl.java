@@ -35,7 +35,7 @@ public class PostCommentRepositoryImpl
         }
 
         @Override
-        public List<PostCommentEntity> findByUserLogin(String login) throws PostCommentRepositoryException {
+        public List<PostCommentEntity> getByUserLogin(String login) throws PostCommentRepositoryException {
                 CriteriaBuilder cb = this.entityManager.criteriaBuilder();
                 CriteriaSelect<PostCommentEntity> cs = cb.createSelect(this.table);
                 try {
@@ -48,7 +48,7 @@ public class PostCommentRepositoryImpl
         }
 
         @Override
-        public List<PostCommentEntity> findByPostId(Object postId) throws PostCommentRepositoryException {
+        public List<PostCommentEntity> getByPostId(Object postId) throws PostCommentRepositoryException {
                 CriteriaBuilder cb = this.entityManager.criteriaBuilder();
                 CriteriaSelect<PostCommentEntity> cs = cb.createSelect(this.table);
 
@@ -62,7 +62,7 @@ public class PostCommentRepositoryImpl
         }
 
         @Override
-        public List<PostCommentEntity> findByPostIdAndUserLogin(Object postId, String login)
+        public List<PostCommentEntity> getByPostIdAndUserLogin(Object postId, String login)
                         throws PostCommentRepositoryException {
                 List<Object> val = Arrays.asList(postId, login);
 

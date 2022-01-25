@@ -13,7 +13,7 @@ public interface PostRepository
 
     Optional<PostEntity> getBySlug(String slug) throws PostRepositoryException;
 
-    List<PostEntity> latestPost() throws PostRepositoryException;
+    List<PostEntity> getLatestPost() throws PostRepositoryException;
 
     List<PostEntity> getPostWithUserComment(String login) throws PostRepositoryException;
 
@@ -21,6 +21,8 @@ public interface PostRepository
 
     List<PostEntity> getByUserId(Object userId) throws PostRepositoryException;
 
-    List<PostEntity> getAllByCategorySlug(String categorySlug) throws PostRepositoryException;
+    List<PostEntity> getPublishedByUserId(Object userId) throws PostRepositoryException;
+
+    List<PostEntity> getByCategorySlug(String categorySlug) throws PostRepositoryException;
 
 }

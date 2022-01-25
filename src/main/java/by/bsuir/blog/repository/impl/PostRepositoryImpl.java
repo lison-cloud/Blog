@@ -39,26 +39,33 @@ public class PostRepositoryImpl
                 CriteriaBuilder cb = this.entityManager.criteriaBuilder();
                 CriteriaSelect<PostEntity> cs = cb.createSelect(this.table);
 
-                PostEntity entity = null;
                 try {
-                        entity = this.entityManager.createQuery(
+                        return Optional.ofNullable(this.entityManager.createQuery(
                                         cs.select(cs.where(cb.equal(table.getColumn("p_title"), title))))
-                                        .getSingleResult();
+                                        .getSingleResult());
                 } catch (MapperException e) {
                         throw new PostRepositoryException(e);
                 }
-                return Optional.ofNullable(entity);
         }
 
         @Override
         public List<PostEntity> getByUserId(Object userId) throws PostRepositoryException {
-                CriteriaBuilder cb = this.entityManager.criteriaBuilder();
-                CriteriaSelect<PostEntity> cs = cb.createSelect(this.table);
-
                 try {
-                        return this.entityManager.createQuery(
-                                        cs.select(cs.where(cb.equal(table.getColumn("p_u_id"), userId))))
-                                        .getResultList();
+                        return this.entityManager.<PostEntity>createQuery(
+                                        "SELECT " + QueryUtils.cols(this.table) + " FROM post WHERE p_u_id = ?;",
+                                        userId, this.table).getResultList();
+                } catch (MapperException e) {
+                        throw new PostRepositoryException(e);
+                }
+        }
+
+        @Override
+        public List<PostEntity> getPublishedByUserId(Object userId) throws PostRepositoryException {
+                try {
+                        return this.entityManager.<PostEntity>createQuery(
+                                        "SELECT " + QueryUtils.cols(this.table)
+                                                        + " FROM post WHERE p_u_id = ? AND p_published=1;",
+                                        userId, this.table).getResultList();
                 } catch (MapperException e) {
                         throw new PostRepositoryException(e);
                 }
@@ -66,24 +73,21 @@ public class PostRepositoryImpl
 
         @Override
         public Optional<PostEntity> getBySlug(String slug) throws PostRepositoryException {
-                CriteriaBuilder cb = this.entityManager.criteriaBuilder();
-                CriteriaSelect<PostEntity> cs = cb.createSelect(this.table);
-                PostEntity entity = null;
                 try {
-                        entity = this.entityManager.createQuery(
-                                        cs.select(cs.where(cb.equal(table.getColumn("p_slug"), slug))))
-                                        .getSingleResult();
+                        return Optional.ofNullable(this.entityManager.<PostEntity>createQuery(
+                                        "SELECT " + QueryUtils.cols(this.table) + " FROM post WHERE p_slug=?;", slug,
+                                        this.table).getSingleResult());
                 } catch (MapperException e) {
                         throw new PostRepositoryException(e);
                 }
-                return Optional.ofNullable(entity);
         }
 
         @Override
         public List<PostEntity> getByTag(String tag) throws PostRepositoryException {
                 try {
                         return this.entityManager.<PostEntity>createQuery("SELECT " + QueryUtils.cols(this.table) +
-                                        " FROM post JOIN post_tag ON post_tag.pt_p_id = post.p_id JOIN tag ON post_tag.pt_t_id=tag.t_id WHERE tag.t_title=? ORDER BY post.p_publishedAt;",
+                                        " FROM post JOIN post_tag ON post_tag.pt_p_id = post.p_id JOIN tag ON " +
+                                        "post_tag.pt_t_id=tag.t_id WHERE tag.t_title=? AND post.p_published=1 ORDER BY post.p_publishedAt;",
                                         tag, this.table).getResultList();
                 } catch (MapperException e) {
                         throw new PostRepositoryException(e);
@@ -91,10 +95,11 @@ public class PostRepositoryImpl
         }
 
         @Override
-        public List<PostEntity> getAllByCategorySlug(String categorySlug) throws PostRepositoryException {
+        public List<PostEntity> getByCategorySlug(String categorySlug) throws PostRepositoryException {
                 try {
                         return this.entityManager.<PostEntity>createQuery("SELECT " + QueryUtils.cols(this.table) +
-                                        " FROM post JOIN category ON post.p_c_id = category.c_id WHERE category.c_slug = ? ORDER BY post.p_publishedAt;",
+                                        " FROM post JOIN category ON post.p_c_id = category.c_id WHERE category.c_slug = ?"
+                                        + " AND post.p_published=1 ORDER BY post.p_publishedAt;",
                                         categorySlug, this.table).getResultList();
                 } catch (MapperException e) {
                         throw new PostRepositoryException(e);
@@ -113,13 +118,14 @@ public class PostRepositoryImpl
         }
 
         @Override
-        public List<PostEntity> latestPost() throws PostRepositoryException {
+        public List<PostEntity> getLatestPost() throws PostRepositoryException {
                 CriteriaBuilder cb = this.entityManager.criteriaBuilder();
                 CriteriaSelect<PostEntity> cs = cb.createSelect(this.table);
 
                 try {
                         return this.entityManager.createQuery(
-                                        cs.select(cs.orderBy(table.getColumn("p_publishedAt"), true)))
+                                        cs.select(cs.orderBy(table.getColumn("p_publishedAt"), false)
+                                                        .where(cb.equal(this.table.getColumn("p_published"), true))))
                                         .getResultList();
                 } catch (MapperException e) {
                         throw new PostRepositoryException(e);

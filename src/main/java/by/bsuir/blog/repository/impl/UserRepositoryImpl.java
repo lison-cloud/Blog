@@ -55,8 +55,7 @@ public class UserRepositoryImpl
                 UserEntity obj = null;
                 try {
                         obj = this.entityManager.createQuery(
-                                        cs.select(
-                                                        cs.where(cb.equal(table.getColumn("u_email"), email))))
+                                        cs.select(cs.where(cb.equal(table.getColumn("u_email"), email))))
                                         .getSingleResult();
                 } catch (MapperException e) {
                         throw new UserRepositoryException(e);
