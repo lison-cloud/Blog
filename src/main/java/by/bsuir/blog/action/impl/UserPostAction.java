@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,11 +26,6 @@ public class UserPostAction
 
     private static final Logger LOGGER = LogManager.getLogger(UserPostAction.class);
 
-    private static final String USER_LOGIN = "userLogin";
-
-    private final PostService postService;
-    private final UserService userService;
-
     private static Action instance;
 
     public static Action getInstance() {
@@ -43,6 +39,9 @@ public class UserPostAction
         return instance;
     }
 
+    private final PostService postService;
+    private final UserService userService;
+
     private UserPostAction() {
         this.postService = PostServiceImpl.getInstance();
         this.userService = UserServiceImpl.getInstance();
@@ -51,16 +50,23 @@ public class UserPostAction
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) {
 
+        HttpSession session = request.getSession();
+        String login = (String) session.getAttribute(LOGIN_PARAM);
+
         String userLogin = (String) request.getParameter(USER_LOGIN);
 
         Optional<User> user = null;
         List<Post> posts = null;
 
         try {
-            user = this.userService.userByLogin(userLogin);
+            user = this.userService.getByLogin(userLogin);
             if (!user.isPresent())
                 return "/WEB-INF/pages/main.jsp";
-            posts = this.postService.userPost(userLogin);
+
+            if (user.get().getLogin().equals(login))
+                posts = this.postService.getUserPost(login);
+            else
+                posts = this.postService.getPublishedUserPost(userLogin);
         } catch (ValidationException e) {
             return "/WEB-INF/pages/main.jsp";
         } catch (UserServiceException | PostServiceException e) {

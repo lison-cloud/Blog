@@ -41,6 +41,7 @@ public class ActionFactoryImpl
         actions.put("usercomment", UserCommentAction.getInstance());
         actions.put("writepost", WritePostAction.getInstance());
         actions.put("sendpost", SendPostAction.getInstance());
+        actions.put("sendcomment", SendCommentAction.getInstance());
         actions.put("relatedpost", RelatedPostAction.getInstance());
         actions.put("userhome", UserHomeAction.getInstance());
     }

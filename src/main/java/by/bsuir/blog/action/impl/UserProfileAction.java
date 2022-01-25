@@ -20,8 +20,6 @@ public class UserProfileAction
 
     private static final Logger LOGGER = LogManager.getLogger(UserProfileAction.class);
 
-    private static final String USER_LOGIN = "userLogin";
-
     private static Action instance;
 
     public static Action getInstance() {
@@ -48,7 +46,7 @@ public class UserProfileAction
 
         Optional<User> user = null;
         try {
-            user = this.userService.userByLogin(userLogin);
+            user = this.userService.getByLogin(userLogin);
         } catch (ValidationException e) {
             return "/WEB-INF/pages/main.jsp";
         } catch (UserServiceException e) {

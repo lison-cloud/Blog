@@ -8,7 +8,6 @@ import by.bsuir.blog.action.Action;
 
 public class LogoutAction
         implements Action {
-    private static final String LOGIN_PARAM = "login";
 
     private static Action instance;
 

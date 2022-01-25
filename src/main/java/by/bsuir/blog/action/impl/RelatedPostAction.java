@@ -18,9 +18,6 @@ public class RelatedPostAction
 
     private static final Logger LOGGER = LogManager.getLogger(RelatedPostAction.class);
 
-    private static final String CATEGORY_SLUG = "category";
-    private static final String TAG_TITLE = "tag";
-
     private static Action instance;
 
     public static Action getInstance() {
@@ -49,9 +46,9 @@ public class RelatedPostAction
         List<Post> posts = null;
         try {
             if (categoryTitle == null || categoryTitle.length() == 0) {
-                posts = this.postService.tagPost(tagTitle);
+                posts = this.postService.getTagPost(tagTitle);
             } else if (tagTitle == null || tagTitle.length() == 0) {
-                posts = this.postService.categoryPost(categoryTitle);
+                posts = this.postService.getCategoryPost(categoryTitle);
             } else {
                 return "/WEB-INF/pages/main.jsp";
             }

@@ -20,8 +20,6 @@ public class UserHomeAction
 
     private static final Logger LOGGER = LogManager.getLogger(UserHomeAction.class);
 
-    private static final String USER_LOGIN = "login";
-
     private static Action instance;
 
     public static Action getInstance() {
@@ -44,11 +42,11 @@ public class UserHomeAction
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) {
 
-        String userLogin = (String) request.getSession().getAttribute(USER_LOGIN);
+        String userLogin = (String) request.getSession().getAttribute(LOGIN_PARAM);
 
         Optional<User> user = null;
         try {
-            user = this.userService.userByLogin(userLogin);
+            user = this.userService.getByLogin(userLogin);
         } catch (ValidationException e) {
             return "/WEB-INF/pages/main.jsp";
         } catch (UserServiceException e) {

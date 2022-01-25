@@ -42,7 +42,7 @@ public class DefaultAction
     public String execute(HttpServletRequest request, HttpServletResponse response) {
         List<Post> posts = null;
         try {
-            posts = this.postService.latestPost();
+            posts = this.postService.getLatestPost();
         } catch (PostServiceException e) {
             LOGGER.error("Can't get posts",e);
         }

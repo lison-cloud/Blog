@@ -21,10 +21,6 @@ public class LoginAction
 
     private static final Logger LOGGER = LogManager.getLogger(LoginAction.class);
 
-    private static final String EMAIL_PARAM = "email";
-    private static final String PASSWD_PARAM = "password";
-    private static final String LOGIN_PARAM = "login";
-
     private static Action instance;
 
     public static Action getInstance() {
@@ -48,11 +44,6 @@ public class LoginAction
     public String execute(HttpServletRequest request, HttpServletResponse response) {
 
         HttpSession session = request.getSession();
-
-        if (session.getAttribute(LOGIN_PARAM) != null) {
-            return "/blog";
-        }
-
         String email = (String) request.getParameter(EMAIL_PARAM);
 
         if (email == null) {
@@ -74,7 +65,7 @@ public class LoginAction
 
         if (!user.isPresent()) {
             request.setAttribute("login_failure", true);
-            request.setAttribute("failure_message", "Wrong password");
+            request.setAttribute("failure_message", "Wrong password or login");
             return "/WEB-INF/pages/login.jsp";
         }
 

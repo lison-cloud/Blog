@@ -21,10 +21,6 @@ public class SignInAction
 
     private static final Logger LOGGER = LogManager.getLogger(SignInAction.class);
 
-    private static final String EMAIL_PARAM = "email";
-    private static final String LOGIN_PARAM = "login";
-    private static final String PASSWD_PARAM = "password";
-
     private static Action instance;
 
     public static Action getInstance() {
@@ -49,7 +45,7 @@ public class SignInAction
 
         HttpSession session = request.getSession();
 
-        if (session.getAttribute(LOGIN_PARAM) != null) {
+        if (session.getAttribute(USER_LOGIN) != null) {
             return "/blog";
         }
 
@@ -59,7 +55,7 @@ public class SignInAction
             return "/WEB-INF/pages/signin.jsp";
         }
 
-        String login = (String) request.getParameter(LOGIN_PARAM);
+        String login = (String) request.getParameter(USER_LOGIN);
         String passwd = (String) request.getParameter(PASSWD_PARAM);
         
         Optional<User> user = null;

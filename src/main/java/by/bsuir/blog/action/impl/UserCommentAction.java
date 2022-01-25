@@ -25,8 +25,6 @@ public class UserCommentAction
 
     private static final Logger LOGGER = LogManager.getLogger(UserCommentAction.class);
 
-    private static final String USER_LOGIN = "userLogin";
-
     private static Action instance;
 
     public static Action getInstance() {
@@ -56,10 +54,10 @@ public class UserCommentAction
         List<Post> posts = null;
         Optional<User> user = null;
         try {
-            user = this.userService.userByLogin(userLogin);
+            user = this.userService.getByLogin(userLogin);
             if (!user.isPresent())
                 return "/WEB-INF/pages/main.jsp";
-            posts = this.postService.postWithUserComment(userLogin);
+            posts = this.postService.getWithUserComment(userLogin);
         } catch (ValidationException e) {
             return "/WEB-INF/pages/main.jsp";
         } catch (UserServiceException | PostServiceException e) {

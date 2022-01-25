@@ -20,8 +20,6 @@ public class PostDetailAction
 
     private static final Logger LOGGER = LogManager.getLogger(PostDetailAction.class);
 
-    private static final String POST_SLUG = "postSlug";
-
     private static Action instance;
 
     public static Action getInstance() {
@@ -44,11 +42,11 @@ public class PostDetailAction
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) {
 
-        String postSlug = (String) request.getParameter(POST_SLUG);
+        String postSlug = (String) request.getParameter(SLUG_PARAM);
 
         Optional<Post> post = null;
         try {
-            post = this.postService.postBySlug(postSlug);
+            post = this.postService.getBySlug(postSlug);
         } catch (ValidationException e) {
             return "/WEB-INF/pages/main.jsp";
         } catch (PostServiceException e) {
