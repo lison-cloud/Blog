@@ -36,7 +36,7 @@
                             <%@ include file="/WEB-INF/fragment/tag.jspf" %>
                         </div>
                         <div class="post-content-category">
-                            <b>Category:</b>
+                            <b><fmt:message key="blog.category" /></b>
                             <span class="post-category">
                                 <a href="<c:url value=''>
                                                             <c:param name='action' value='relatedPost' />
@@ -52,13 +52,33 @@
         </c:choose>
     </div>
     <div class="content-comment">
+        <div class="write-comment">
+            <c:choose>
+                <c:when test="${login==null}">
+                    <p><fmt:message key='blog.cantwritecomment' /></p>
+                </c:when>
+                <c:otherwise>
+                    <form action="<c:url value=''>
+                        <c:param name='action' value='sendComment' />
+                        <c:param name='postSlug' value='${post.slug}' />
+                        </c:url>" method="post">
+                        <div class="comment-write-body" style="width: 100%;">
+                            <textarea name="comment-content">...</textarea>
+                        </div>
+                        <div class="comment-write-bottom" style="padding: 10px 0;">
+                            <input type="submit" value="<fmt:message key='blog.send' />" style="padding: 10px 5px;">
+                        </div>
+                    </form>
+                </c:otherwise>
+            </c:choose>
+        </div>
         <div class="content-comment-info">
             <fmt:message key="blog.comments" />:${fn:length(post.comments)}
         </div>
         <div class="content-comment-list">
             <c:choose>
                 <c:when test="${fn:length(post.comments)==0}">
-                    <p>No comments yet...</p>
+                    <p><fmt:message key='blog.nocomment' /></p>
                 </c:when>
                 <c:otherwise>
                     <c:forEach items="${post.comments}" var="comment">
