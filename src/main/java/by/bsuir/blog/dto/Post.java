@@ -22,7 +22,7 @@ public class Post
 
     private Category category;
 
-    private List<Tag> tags;
+    private List<String> tags;
 
     private List<PostComment> comments;
 
@@ -110,11 +110,11 @@ public class Post
         this.category = category;
     }
 
-    public List<Tag> getTags() {
+    public List<String> getTags() {
         return tags;
     }
 
-    public void setTags(List<Tag> tags) {
+    public void setTags(List<String> tags) {
         this.tags = tags;
     }
 
@@ -129,10 +129,12 @@ public class Post
     @Override
     public String toString() {
         return "Post [category=" + category + ", comments=" + comments + ", content=" + content + ", createdAt="
-                + createdAt + ", id=" + id + ", isPublished=" + published + ", publishedAt=" + publishedAt + ", slug="
+                + createdAt + ", id=" + id + ", published=" + published + ", publishedAt=" + publishedAt + ", slug="
                 + slug + ", tags=" + tags + ", title=" + title + ", updateAt=" + updateAt + ", userLogin=" + userLogin
                 + "]";
     }
+
+    
 
     
 
