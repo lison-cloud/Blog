@@ -8,9 +8,9 @@
                                                             <span class="post-tag">
                                                                 <a href="<c:url value=''>
                                                                             <c:param name='action' value='relatedPost' />
-                                                                            <c:param name='tag' value='${tag.title}' />
+                                                                            <c:param name='tag' value='${tag}' />
                                                                             </c:url>" class="post-tag-link">
-                                                                    <c:out value="${tag.title}" />
+                                                                    <c:out value="${tag}" />
                                                                 </a>
                                                             </span>
                                                         </c:forEach>
